@@ -43,4 +43,22 @@ export default defineSchema({
   })
     .index("by_user_id", ["userId"])
     .index("by_active", ["isActive"]),
+
+  foodScans: defineTable({
+    userId: v.string(),
+    imageUrl: v.string(),
+    timestamp: v.number(),
+    foodItems: v.array(
+      v.object({
+        name: v.string(),
+        calories: v.number(),
+        protein: v.optional(v.number()),
+        carbs: v.optional(v.number()),
+        fat: v.optional(v.number()),
+      })
+    ),
+    totalCalories: v.number(),
+  })
+    .index("by_user_id", ["userId"])
+    .index("by_timestamp", ["timestamp"]),
 });

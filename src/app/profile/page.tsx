@@ -9,6 +9,7 @@ import NoFitnessPlan from "@/components/NoFitnessPlan";
 import CornerElements from "@/components/CornerElements";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 import { AppleIcon, CalendarIcon, DumbbellIcon } from "lucide-react";
 import {
   Accordion,
@@ -17,6 +18,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
+import {
+  Sparkles,
+} from "lucide-react";
 
 const ProfilePage = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -36,7 +40,8 @@ const ProfilePage = () => {
   const isPlansLoading = userId && allPlans === undefined;
 
   return (
-    <section className="relative z-10 pt-12 pb-32 flex-grow container mx-auto px-4">
+    <div className="flex items-center flex-col ">
+    <section className="relative z-10 pt-12 pb-8 flex-grow container mx-auto px-4">
       {isUserLoading ? (
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <Loader size="lg" variant="primary" className="mb-4" />
@@ -231,6 +236,16 @@ const ProfilePage = () => {
         </>
       )}
     </section>
+    <Link href="/scan-food">
+            <Button
+              size="lg"
+              className="bg-primary text-primary-foreground mb-8 hover:bg-primary/90 px-8 py-6 text-lg"
+            >
+              Scan Food With AI
+              <Sparkles className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+    </div>
   );
 };
 export default ProfilePage;

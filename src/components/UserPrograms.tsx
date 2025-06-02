@@ -14,7 +14,7 @@ import { USER_PROGRAMS } from "@/constants";
 
 const UserPrograms = () => {
   return (
-    <div className="w-full pb-24 pt-16 relative">
+    <div className="w-full pb-20 pt-16 relative">
       <div className="container mx-auto max-w-6xl px-4">
         {/* HEADER- PROGRAM GALLERY */}
         <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg overflow-hidden mb-16">
@@ -185,7 +185,7 @@ const UserPrograms = () => {
         </div>
 
         {/* CTA section */}
-        <div className="mt-16 text-center">
+        <div className="mt-16  flex  justify-center gap-3">
           <Link href="/generate-program">
             <Button
               size="lg"
@@ -195,10 +195,22 @@ const UserPrograms = () => {
               <Sparkles className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <p className="text-muted-foreground mt-4">
+          <h3 className="pt-3 font-mono font-bold">OR</h3>
+          <Link href="/scan-food">
+            <Button
+              size="lg"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg"
+            >
+             Scan Food With AI
+              <Sparkles className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+        <div className="flex  justify-center">
+        <p className="text-muted-foreground mt-4">
             Join 500+ users with AI-customized fitness programs
           </p>
-        </div>
+          </div>
       </div>
     </div>
   );
