@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { scanFoodImage } from "../../../actions/food-scan";
 import { useUser } from "@clerk/nextjs";
 import CornerElements from "@/components/CornerElements";
@@ -14,7 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function ScanPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -24,7 +23,6 @@ export default function ScanPage() {
   const [error, setError] = useState<string | null>(null);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
 
-  const router = useRouter();
   const { user } = useUser();
   const userId = user?.id;
 
