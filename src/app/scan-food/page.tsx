@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
 
 export default function ScanPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -22,6 +25,12 @@ export default function ScanPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
+
+  const deleteFoodScan = useMutation(api.foodScans.deleteFoodScan);
+  const handleDelete = async (scanId: string) => {
+    await deleteFoodScan({ scanId: scanId as any });
+    toast.success("Scan deleted successfully");
+  };
 
   const { user } = useUser();
   const userId = user?.id;
@@ -59,7 +68,9 @@ export default function ScanPage() {
 
   return (
     <div className="w-full min-h-screen px-4 py-8 md:px-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Food Scanner</h1>
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+        Food Scanner
+      </h1>
 
       <form onSubmit={handleSubmit} className="w-full space-y-4 ">
         <div className="border-2 border-dashed  border-gray-300 rounded-lg p-4 text-center">
@@ -127,7 +138,7 @@ export default function ScanPage() {
         </div>
       )}
 
-      {recentScans && recentScans.length > 0 && (
+      {recentScans && recentScans.length > 0 ? (
         <div className="w-full max-w-4xl px-4 pt-8">
           <div className="relative backdrop-blur-sm border border-border p-6 rounded-lg mb-8">
             <CornerElements />
@@ -141,62 +152,104 @@ export default function ScanPage() {
             <div className="h-px w-full bg-gradient-to-r from-primary via-secondary to-primary opacity-50 my-4"></div>
             <Accordion type="multiple" className="space-y-4">
               {recentScans.map((scan) => (
-                <AccordionItem key={scan._id} value={scan._id} className="border rounded-lg overflow-hidden">
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/10 font-mono">
-                    <div className="flex justify-between w-full items-center">
-                      <span className="text-primary">
-                        {new Date(scan.timestamp).toLocaleDateString()}
-                      </span>
-                      <div className="text-xs text-muted-foreground">
-                        {scan.totalCalories} CAL
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-4 px-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      {scan.imageUrl && (
-                        <img
-                          src={scan.imageUrl}
-                          alt="Food"
-                          className="w-12 h-12 object-cover rounded-md border border-border cursor-pointer"
-                          onClick={() => setModalImageUrl(scan.imageUrl)}
-                        />
-                      )}
-                    </div>
-                    <div className="space-y-2 mt-2">
-                      {scan.foodItems.map((item, idx) => (
-                        <div key={idx} className="border-b border-border pb-2 last:border-b-0">
-                          <div className="flex justify-between">
-                            <span className="font-bold text-xl text-primary font-mono">{item.name}</span>
-                            <span className="font-normal text-xl text-primary font-mono">
-                              {item.calories} cal
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
-                            <span className="text-foreground text-xs font-mono font-semibold">
-                              Protein: {item.protein !== undefined ? `${item.protein}g` : "N/A"}
-                            </span>
-                            <span className="text-foreground font-mono font-semibold">
-                              Carbs: {item.carbs !== undefined ? `${item.carbs}g` : "N/A"}
-                            </span>
-                            <span className="text-foreground font-mono font-semibold">
-                              Fat: {item.fat !== undefined ? `${item.fat}g` : "N/A"}
-                            </span>
-                          </div>
+                <div key={scan._id} className="flex flex-col ">
+                  <AccordionItem
+                    key={scan._id}
+                    value={scan._id}
+                    className="border rounded-lg overflow-hidden"
+                  >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/10 ">
+                      <div className="flex justify-between w-full items-center">
+                        {/* Left side: Date */}
+                        <span className="text-primary">
+                          {new Date(scan.timestamp).toLocaleString(undefined, {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </span>
+
+                        {/* Right side: Calories + Trash */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-muted-foreground font-mono font-extrabold">
+                            {scan.totalCalories} CAL
+                          </span>
+                          <button
+                            onClick={() => handleDelete(scan._id)}
+                            className="text-red-500 hover:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                      </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="pb-4 px-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        {scan.imageUrl && (
+                          <img
+                            src={scan.imageUrl}
+                            alt="Food"
+                            className="w-12 h-12 object-cover rounded-md border border-border cursor-pointer"
+                            onClick={() => setModalImageUrl(scan.imageUrl)}
+                          />
+                        )}
+                      </div>
+                      <div className="space-y-2 mt-2">
+                        {scan.foodItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="border-b border-border pb-2 last:border-b-0"
+                          >
+                            <div className="flex justify-between">
+                              <span className="font-bold text-xl text-primary font-mono">
+                                {item.name}
+                              </span>
+                              <span className="font-normal text-xl text-primary font-mono">
+                                {item.calories} cal
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1 text-xs text-muted-foreground">
+                              <span className="text-foreground text-xs font-mono font-semibold">
+                                Protein:{" "}
+                                {item.protein !== undefined
+                                  ? `${item.protein}g`
+                                  : "N/A"}
+                              </span>
+                              <span className="text-foreground font-mono font-semibold">
+                                Carbs:{" "}
+                                {item.carbs !== undefined
+                                  ? `${item.carbs}g`
+                                  : "N/A"}
+                              </span>
+                              <span className="text-foreground font-mono font-semibold">
+                                Fat:{" "}
+                                {item.fat !== undefined
+                                  ? `${item.fat}g`
+                                  : "N/A"}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </div>
               ))}
             </Accordion>
           </div>
+        </div>
+      ) : (
+        <div className="text-center mt-8 text-muted-foreground text-sm">
+          No foods scanned.
         </div>
       )}
 
       {/* Image Preview Modal */}
       {modalImageUrl && (
-        <Dialog open={!!modalImageUrl} onOpenChange={() => setModalImageUrl(null)}>
+        <Dialog
+          open={!!modalImageUrl}
+          onOpenChange={() => setModalImageUrl(null)}
+        >
           <DialogContent className="p-4 max-w-lg w-full">
             <img
               src={modalImageUrl}

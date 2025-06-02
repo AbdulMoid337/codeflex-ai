@@ -1,3 +1,4 @@
+"use-client"
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -5,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import ConvexClerkProvider from "@/providers/ConvexClerkProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +45,7 @@ export default function RootLayout({
 
           <main className="pt-24 flex-grow">{children}</main>
           <Footer />
+          <Toaster richColors position="bottom-center" />
           <Analytics />
         </body>
       </html>

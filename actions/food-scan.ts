@@ -44,7 +44,7 @@ export async function scanFoodImage(file: File) {
         "totalCalories": number
       }
 
-      If it's not a food image, return an empty object
+     If the image is not of food, return: {}
     `;
 
     const result = await model.generateContent([
