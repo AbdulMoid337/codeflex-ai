@@ -61,4 +61,13 @@ export default defineSchema({
   })
     .index("by_user_id", ["userId"])
     .index("by_timestamp", ["timestamp"]),
+
+    goals: defineTable({
+      userId: v.string(),
+      type: v.union(v.literal("calories"), v.literal("protein"), v.literal("carbs"), v.literal("fat")),
+      target: v.number(),
+      period: v.union(v.literal("daily"), v.literal("weekly")),
+      createdAt: v.number()
+    }).index("by_user_id", ["userId"]),
+    
 });
