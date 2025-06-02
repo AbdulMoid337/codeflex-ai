@@ -76,7 +76,7 @@ export default function ScanPage() {
                   setFile(null);
                   setPreview(null);
                 }}
-                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                className="absolute w-8 top-2 right-9 bg-red-400  font-extrabold text-black p-1 rounded-full"
               >
                 ✕
               </button>
