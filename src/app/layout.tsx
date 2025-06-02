@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
-
 import ConvexClerkProvider from "@/providers/ConvexClerkProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -31,7 +30,7 @@ export default function RootLayout({
     <ConvexClerkProvider>
       <html lang="en">
       <head>
-          <link rel="icon" href="/hero-ai3.png" sizes="any" type="image/png"  />
+          <link rel="icon" href="/zap.png" sizes="any" type="image/png"  />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <Navbar />
