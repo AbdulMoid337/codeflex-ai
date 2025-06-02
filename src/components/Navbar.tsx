@@ -5,6 +5,7 @@ import { DumbbellIcon, HomeIcon, MenuIcon, UserIcon, X, ZapIcon } from "lucide-r
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
+import { Brain } from "lucide-react";
 
 const Navbar = () => {
   const { isSignedIn } = useUser();
@@ -73,13 +74,22 @@ const Navbar = () => {
                   <UserIcon size={16} />
                   <span>Profile</span>
                 </Link>
+                <Link
+                  href="/scan-food"
+                  className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Brain size={16} />
+                  <span className="font-mono">AI Meal Scanner</span>
+                </Link>
                 <Button
                   asChild
                   variant="outline"
                   className="ml-2 border-primary/50 text-primary hover:text-white hover:bg-primary/10"
                 >
-                  <Link href="/generate-program">Get Started</Link>
+                  <Link href="/generate-program ">Get Started</Link>
                 </Button>
+                
                 <UserButton />
               </>
             ) : (
@@ -162,25 +172,31 @@ const Navbar = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <HomeIcon size={16} />
-                  <span>Home</span>
+                  <span className="font-mono">Home</span>
                 </Link>
-
                 <Link
                   href="/generate-program"
                   className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <DumbbellIcon size={16} />
-                  <span>Generate</span>
+                  <span className="font-mono">Generate</span>
                 </Link>
-
                 <Link
                   href="/profile"
                   className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <UserIcon size={16} />
-                  <span>Profile</span>
+                  <span className="font-mono">Profile</span>
+                </Link>
+                <Link
+                  href="/scan-food"
+                  className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Brain size={16} />
+                  <span className="font-mono">AI Meal Scanner✨</span>
                 </Link>
               </nav>
             </div>
