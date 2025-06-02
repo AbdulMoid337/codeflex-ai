@@ -29,6 +29,9 @@ export default function RootLayout({
   return (
     <ConvexClerkProvider>
       <html lang="en">
+      <head>
+          <link rel="icon" href="/hero-ai3.png" sizes="any" type="image/png"  />
+        </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <Navbar />
 
