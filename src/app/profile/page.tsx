@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
 import ProfileHeader from "@/components/ProfileHeader";
@@ -10,7 +10,7 @@ import CornerElements from "@/components/CornerElements";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
-import { AppleIcon, CalendarIcon, DumbbellIcon } from "lucide-react";
+import { AppleIcon, CalendarIcon, DumbbellIcon, Trash2, Loader2 , Sparkles} from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -18,15 +18,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
-import {
-  Sparkles,
-} from "lucide-react";
+import { toast } from "sonner";
 
 const ProfilePage = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
   const userId = user?.id as string;
 
-  const allPlans = useQuery(api.plans.getUserPlans, { userId });
+  const allPlans = useQuery(
+    api.plans.getUserPlans,
+    userId ? { userId } : "skip"
+  );
   const [selectedPlanId, setSelectedPlanId] = useState<null | string>(null);
 
   const activePlan = allPlans?.find((plan) => plan.isActive);
@@ -38,6 +39,9 @@ const ProfilePage = () => {
   // Loading states
   const isUserLoading = !isUserLoaded;
   const isPlansLoading = userId && allPlans === undefined;
+
+  const deletePlan = useMutation(api.plans.deletePlan);
+  const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null);
 
   return (
     <div className="flex items-center flex-col ">
@@ -74,22 +78,43 @@ const ProfilePage = () => {
 
                 <div className="flex flex-wrap gap-2">
                   {allPlans.map((plan) => (
-                    <Button
-                      key={plan._id}
-                      onClick={() => setSelectedPlanId(plan._id)}
-                      className={`text-foreground border hover:text-white ${
-                        selectedPlanId === plan._id
-                          ? "bg-primary/20 text-primary border-primary"
-                          : "bg-transparent border-border hover:border-primary/50"
-                      }`}
-                    >
-                      {plan.name}
-                      {plan.isActive && (
-                        <span className="ml-2 bg-green-500/20 text-green-500 text-xs px-2 py-0.5 rounded">
-                          ACTIVE
-                        </span>
-                      )}
-                    </Button>
+                    <div key={plan._id} className="relative flex items-center">
+                      <Button
+                        onClick={() => setSelectedPlanId(plan._id)}
+                        className={`relative flex items-center gap-2 text-foreground border hover:text-white ${
+                          selectedPlanId === plan._id
+                            ? "bg-primary/20 text-primary border-primary"
+                            : "bg-transparent border-border hover:border-primary/50"
+                        }`}
+                      >
+                        {plan.name}
+                        {plan.isActive && (
+                          <span className="ml-2 bg-green-500/20 text-green-500 text-xs px-2 py-0.5 rounded">
+                            ACTIVE
+                          </span>
+                        )}
+                        <button
+                          className="ml-2 text-red-500 hover:text-red-700 p-1 rounded transition"
+                          disabled={deletingPlanId === plan._id}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setDeletingPlanId(plan._id);
+                            await deletePlan({ planId: plan._id });
+                            setDeletingPlanId(null);
+                            if (selectedPlanId === plan._id) setSelectedPlanId(null);
+                            toast.success("Plan deleted successfully");
+                          }}
+                          title="Delete plan"
+                          type="button"
+                        >
+                          {deletingPlanId === plan._id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </div>
