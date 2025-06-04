@@ -317,7 +317,7 @@ export default function GoalsPage() {
               <div className="space-y-4">
                 {isMobile ? (
                   <div className="space-y-4">
-                    {goalsList.map((goal, idx) => (
+                    {goalsList.map((goal) => (
                       <div
                         key={goal._id}
                         className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg"
