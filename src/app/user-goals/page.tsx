@@ -8,7 +8,20 @@ import { Loader } from "@/components/ui/loader";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Pencil, Save, Loader2, GripVertical } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import {
   BarChart,
@@ -20,6 +33,113 @@ import {
   Cell,
 } from "recharts";
 
+// Define types for goal and props
+interface Goal {
+  _id: string;
+  type: string;
+  period: string;
+  target: number;
+  current: number;
+  percent: number;
+}
+
+interface SortableGoalItemProps {
+  goal: Goal;
+  idx: number;
+  editGoalId: string | null;
+  savingGoalId: string | null;
+  saveGoal: () => Promise<void>;
+  handleEdit: (goal: Goal) => void;
+  setSavingGoalId: (id: string | null) => void;
+  GripVertical: typeof GripVertical;
+  Loader2: typeof Loader2;
+  Save: typeof Save;
+  Pencil: typeof Pencil;
+}
+
+function SortableGoalItem({ goal, idx, editGoalId, savingGoalId, saveGoal, handleEdit, setSavingGoalId, GripVertical, Loader2, Save, Pencil }: SortableGoalItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: goal._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : "auto",
+    opacity: isDragging ? 0.9 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`border border-border rounded-2xl p-4 bg-white/10 shadow-lg transition-colors ${
+        isDragging ? "shadow-2xl bg-primary/10 border-primary/30" : ""
+      }`}
+    >
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          {/* Drag Handle */}
+          <span
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground"
+          >
+            <GripVertical className="w-4 h-4" />
+          </span>
+          <h3 className="text-lg font-semibold capitalize">
+            {goal.type} ({goal.period})
+          </h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-mono text-muted-foreground">
+            {Math.round(goal.current)}/{goal.target}
+            {goal.type === "calories" ? "" : "g"}
+          </span>
+          <button
+            onClick={async () => {
+              if (editGoalId === goal._id) {
+                setSavingGoalId(goal._id);
+                await saveGoal();
+                setSavingGoalId(null);
+              } else {
+                handleEdit(goal);
+              }
+            }}
+            className="text-muted-foreground hover:text-primary transition"
+            title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
+            disabled={savingGoalId === goal._id}
+          >
+            {editGoalId === goal._id ? (
+              savingGoalId === goal._id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )
+            ) : (
+              <Pencil className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      </div>
+      <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+        <div
+          className="bg-primary h-full rounded-full transition-all duration-500"
+          style={{ width: `${goal.percent}%` }}
+        ></div>
+      </div>
+      <p className="text-xs text-muted-foreground mt-1">
+        {Math.min(goal.percent, 100).toFixed(1)}% of your {goal.period} {goal.type} goal reached
+      </p>
+    </div>
+  );
+}
+
 export default function GoalsPage() {
   const { user } = useUser();
   const userId = user?.id;
@@ -29,15 +149,6 @@ export default function GoalsPage() {
   const [period, setPeriod] = useState("daily");
   const [editGoalId, setEditGoalId] = useState<string | null>(null);
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
-
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const items = Array.from(goalsList);
-    const [reordered] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reordered);
-    setGoalsList(items);
-  };
 
   const goalsProgress = useQuery(api.goals.getGoalProgress, {
     userId: userId || "",
@@ -52,7 +163,6 @@ export default function GoalsPage() {
     percent: parseFloat(goal.percent.toFixed(1)),
   }));
 
-  // const goals = useQuery(api.goals.getGoals, { userId: userId || "" });
   const upsertGoal = useMutation(api.goals.upsertGoal);
 
   const saveGoal = async () => {
@@ -76,11 +186,31 @@ export default function GoalsPage() {
     setEditGoalId(goal._id);
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
+
+  const handleDragEnd = (event: import("@dnd-kit/core").DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const oldIndex = goalsList.findIndex((item) => item._id === active.id);
+    const newIndex = goalsList.findIndex((item) => item._id === over.id);
+
+    if (oldIndex !== newIndex) {
+      setGoalsList((items) => arrayMove(items, oldIndex, newIndex));
+    }
+  };
+
   return (
     <div className="w-full min-h-screen px-4 py-8 md:px-8 max-w-4xl mx-auto">
       <div className="space-y-8">
         {/* GOAL FORM */}
-        <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80">
+        <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80 overflow-hidden">
           <CornerElements />
           <div className="flex items-center gap-2 mb-4">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
@@ -162,7 +292,7 @@ export default function GoalsPage() {
 
         {goalsProgress && goalsProgress.length > 0 ? (
           <>
-            <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80">
+            <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80 overflow-hidden">
               <CornerElements />
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
@@ -173,83 +303,35 @@ export default function GoalsPage() {
               </div>
               <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
               <div className="space-y-4">
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="goals">
-                    {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                        {goalsList.map((goal, idx) => (
-                          <Draggable key={goal._id} draggableId={goal._id} index={idx}>
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg hover:bg-primary/5 transition"
-                              >
-                                <div className="flex justify-between items-center mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      {...provided.dragHandleProps}
-                                      className="cursor-grab active:cursor-grabbing text-muted-foreground"
-                                    >
-                                      <GripVertical className="w-4 h-4" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold capitalize">
-                                      {goal.type} ({goal.period})
-                                    </h3>
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-mono text-muted-foreground">
-                                      {Math.round(goal.current)}/{goal.target}
-                                      {goal.type === "calories" ? "" : "g"}
-                                    </span>
-                                    <button
-                                      onClick={async () => {
-                                        if (editGoalId === goal._id) {
-                                          setSavingGoalId(goal._id);
-                                          await saveGoal();
-                                          setSavingGoalId(null);
-                                        } else {
-                                          handleEdit(goal);
-                                        }
-                                      }}
-                                      className="text-muted-foreground hover:text-primary transition"
-                                      title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
-                                      disabled={savingGoalId === goal._id}
-                                    >
-                                      {editGoalId === goal._id ? (
-                                        savingGoalId === goal._id ? (
-                                          <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                          <Save className="w-4 h-4" />
-                                        )
-                                      ) : (
-                                        <Pencil className="w-4 h-4" />
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-                                  <div
-                                    className="bg-primary h-full rounded-full transition-all duration-500"
-                                    style={{ width: `${goal.percent}%` }}
-                                  ></div>
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {Math.min(goal.percent, 100).toFixed(1)}% of your{" "}
-                                  {goal.period} {goal.type} goal reached
-                                </p>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={goalsList.map((goal) => goal._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-4">
+                      {goalsList.map((goal, idx) => (
+                        <SortableGoalItem
+                          key={goal._id}
+                          goal={goal}
+                          idx={idx}
+                          editGoalId={editGoalId}
+                          savingGoalId={savingGoalId}
+                          saveGoal={saveGoal}
+                          handleEdit={handleEdit}
+                          setSavingGoalId={setSavingGoalId}
+                          GripVertical={GripVertical}
+                          Loader2={Loader2}
+                          Save={Save}
+                          Pencil={Pencil}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </div>
             </div>
 
