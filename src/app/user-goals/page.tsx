@@ -57,7 +57,7 @@ interface SortableGoalItemProps {
   Pencil: typeof Pencil;
 }
 
-function SortableGoalItem({ goal, idx, editGoalId, savingGoalId, saveGoal, handleEdit, setSavingGoalId, GripVertical, Loader2, Save, Pencil }: SortableGoalItemProps) {
+function SortableGoalItem({ goal, editGoalId, savingGoalId, saveGoal, handleEdit, setSavingGoalId, GripVertical, Loader2, Save, Pencil }: SortableGoalItemProps) {
   const {
     attributes,
     listeners,
@@ -298,7 +298,7 @@ export default function GoalsPage() {
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 <h2 className="text-2xl font-bold tracking-tight text-primary drop-shadow-lg">
                   <span className="text-primary">Your</span>{" "}
-                  <span className="text-foreground">Goal Progress.</span>
+                  <span className="text-foreground">Goal Progress</span>
                 </h2>
               </div>
               <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
