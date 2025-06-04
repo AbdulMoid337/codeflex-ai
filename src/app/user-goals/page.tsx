@@ -7,7 +7,7 @@ import CornerElements from "@/components/CornerElements";
 import { Loader } from "@/components/ui/loader";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Pencil, Save } from "lucide-react";
+import { Pencil, Save, Loader2 } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -26,6 +26,7 @@ export default function GoalsPage() {
   const [target, setTarget] = useState("");
   const [period, setPeriod] = useState("daily");
   const [editGoalId, setEditGoalId] = useState<string | null>(null);
+  const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
 
   const goalsProgress = useQuery(api.goals.getGoalProgress, {
     userId: userId || "",
@@ -38,20 +39,18 @@ export default function GoalsPage() {
   // const goals = useQuery(api.goals.getGoals, { userId: userId || "" });
   const upsertGoal = useMutation(api.goals.upsertGoal);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveGoal = async () => {
     if (!userId || !target) return;
-      await upsertGoal({
-        userId,
-        type: type as any,
-        target: parseInt(target),
-        period: period as any,
-        ...(editGoalId ? { _id: editGoalId } : {}),
-      });
-      setTarget("");
-      setEditGoalId(null);
-      toast.success(editGoalId ? "Goal updated!" : "Goal saved!");
-   
+    await upsertGoal({
+      userId,
+      type: type as any,
+      target: parseInt(target),
+      period: period as any,
+      ...(editGoalId ? { _id: editGoalId } : {}),
+    });
+    setTarget("");
+    setEditGoalId(null);
+    toast.success(editGoalId ? "Goal updated!" : "Goal saved!");
   };
 
   const handleEdit = (goal: any) => {
@@ -78,7 +77,13 @@ export default function GoalsPage() {
           </div>
           <div className="h-px w-full bg-gradient-to-r from-primary via-secondary to-primary opacity-50 my-4"></div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await saveGoal();
+            }}
+            className="space-y-4"
+          >
             <div className="flex gap-4">
               <select
                 value={type}
@@ -167,14 +172,27 @@ export default function GoalsPage() {
                           {goal.type === "calories" ? "" : "g"}
                         </span>
                         <button
-                          onClick={() => handleEdit(goal)}
+                          onClick={async () => {
+                            if (editGoalId === goal._id) {
+                              setSavingGoalId(goal._id);
+                              await saveGoal();
+                              setSavingGoalId(null);
+                            } else {
+                              handleEdit(goal);
+                            }
+                          }}
                           className="text-muted-foreground hover:text-primary transition"
-                          title="Edit goal"
+                          title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
+                          disabled={savingGoalId === goal._id}
                         >
-                          {!target ? (
-                            <Pencil className="w-4 h-4" />
+                          {editGoalId === goal._id ? (
+                            savingGoalId === goal._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Save className="w-4 h-4" />
+                            )
                           ) : (
-                            <Save className="w-4 h-4" />
+                            <Pencil className="w-4 h-4" />
                           )}
                         </button>
                       </div>
