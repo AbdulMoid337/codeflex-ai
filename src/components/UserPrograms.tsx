@@ -187,24 +187,24 @@ const UserPrograms = () => {
         {/* CTA section */}
    <div className="mt-16 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 text-center">
   <Link href="/generate-program">
-    <Button
+  <Button
       size="lg"
-      className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg w-full md:w-auto"
+      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
     >
-      Generate Your Program
-      <Sparkles className="ml-2 h-5 w-5" />
+       Generate Your Program
+      <Sparkles className=" h-5 w-5" />
     </Button>
   </Link>
 
   <h3 className="pt-3 font-mono font-bold md:pt-0">OR</h3>
 
   <Link href="/scan-food">
-    <Button
+  <Button
       size="lg"
-      className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg w-full md:w-auto"
+      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
     >
-      Scan Food With AI
-      <Sparkles className="ml-2 h-5 w-5" />
+       Scan Food With AI
+      <Sparkles className=" h-5 w-5" />
     </Button>
   </Link>
 </div>

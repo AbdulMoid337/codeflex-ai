@@ -38,11 +38,11 @@ const Navbar = () => {
       <div ref={navbarRef} className="container mx-auto flex items-center justify-between flex-col">
         <div className="w-full flex items-center justify-between">
           {/* LOGO */}
-          <Link href="/" className="flex items-center relative pl-2 gap-2">
-            <div className="p-1 bg-primary/10 rounded">
-              <ZapIcon className="w-4 h-4 text-primary" />
+          <Link href="/" className="flex items-center relative pl-2 gap-3">
+            <div className="p-2 bg-primary/20 rounded-full shadow-lg">
+              <ZapIcon className="w-6 h-6 text-primary drop-shadow" />
             </div>
-            <span className="text-xl font-bold font-mono">
+            <span className="text-2xl font-extrabold font-mono tracking-tight drop-shadow-lg">
               code<span className="text-primary">flex</span>.ai
             </span>
           </Link>
@@ -164,7 +164,7 @@ const Navbar = () => {
         {/* MOBILE MENU - Only shown when signed in and menu is open */}
         {isSignedIn && mobileMenuOpen && (
           <div className="md:hidden animate-fadeIn w-full">
-            <div className="container mx-auto py-4 px-4 bg-background/95 border-b border-border">
+            <div className="container mx-auto py-4 px-4 bg-background/90 rounded-2xl shadow-xl border border-border">
               <nav className="flex flex-col gap-4">
                 <Link
                   href="/"

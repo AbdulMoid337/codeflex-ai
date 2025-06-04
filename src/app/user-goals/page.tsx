@@ -64,18 +64,18 @@ export default function GoalsPage() {
     <div className="w-full min-h-screen px-4 py-8 md:px-8 max-w-4xl mx-auto">
       <div className="space-y-8">
         {/* GOAL FORM */}
-        <div className="relative backdrop-blur-sm border border-border p-6 rounded-lg">
+        <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80">
           <CornerElements />
           <div className="flex items-center gap-2 mb-4">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-            <h2 className="text-xl font-bold tracking-tight">
+            <h2 className="text-3xl font-extrabold tracking-tight text-primary drop-shadow-lg">
               <span className="text-primary">
                 {editGoalId ? "Edit" : "Set"}
               </span>{" "}
               <span className="text-foreground">Nutritional Goal</span>
             </h2>
           </div>
-          <div className="h-px w-full bg-gradient-to-r from-primary via-secondary to-primary opacity-50 my-4"></div>
+          <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
 
           <form
             onSubmit={async (e) => {
@@ -88,7 +88,7 @@ export default function GoalsPage() {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="w-1/2 p-2 rounded border bg-background/80 border-border"
+                className="w-1/2 p-2 rounded-lg border bg-background/80 border-border shadow"
               >
                 <option value="calories">Calories</option>
                 <option value="protein">Protein</option>
@@ -99,7 +99,7 @@ export default function GoalsPage() {
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="w-1/2 p-2 rounded border bg-background/80 border-border"
+                className="w-1/2 p-2 rounded-lg border bg-background/80 border-border shadow"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -112,22 +112,22 @@ export default function GoalsPage() {
               placeholder="Target Value"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              className="w-full p-2 rounded border bg-background/80 border-border"
+              className="w-full p-3 rounded-lg border bg-background/80 border-border shadow"
               required
             />
 
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white font-bold py-3 rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 text-lg"
               disabled={!target}
             >
               {editGoalId ? (
                 <>
-                  Update Goal <Save className="w-4 h-4" />
+                  Update Goal <Save className="w-5 h-5" />
                 </>
               ) : (
                 <>
-                  Save Goal <Save className="w-4 h-4" />
+                  Save Goal <Save className="w-5 h-5" />
                 </>
               )}
             </button>
@@ -146,21 +146,21 @@ export default function GoalsPage() {
 
         {goalsProgress && goalsProgress.length > 0 ? (
           <>
-            <div className="relative backdrop-blur-sm border border-border p-6 rounded-lg">
+            <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80">
               <CornerElements />
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                <h2 className="text-xl font-bold tracking-tight">
+                <h2 className="text-2xl font-bold tracking-tight text-primary drop-shadow-lg">
                   <span className="text-primary">Your</span>{" "}
                   <span className="text-foreground">Goal Progress</span>
                 </h2>
               </div>
-              <div className="h-px w-full bg-gradient-to-r from-primary via-secondary to-primary opacity-50 my-4"></div>
+              <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
               <div className="space-y-4">
                 {goalsProgress.map((goal, idx) => (
                   <div
                     key={idx}
-                    className="border border-border rounded-lg p-4 bg-background/80 shadow-sm"
+                    className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg hover:bg-primary/5 transition"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-lg font-semibold capitalize">
@@ -213,9 +213,9 @@ export default function GoalsPage() {
             </div>
 
             {/* RECHART VISUALIZATION */}
-            <div className="relative backdrop-blur-sm border border-border p-6 rounded-lg">
+            <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80">
               <CornerElements />
-              <h2 className="text-xl font-bold mb-4 text-foreground">
+              <h2 className="text-2xl font-bold mb-4 text-foreground drop-shadow-lg">
                 <span className="text-primary">Visual</span> Overview
               </h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -236,7 +236,7 @@ export default function GoalsPage() {
             </div>
           </>
         ) : (
-          <div className="relative backdrop-blur-sm border border-border p-6 rounded-lg text-center">
+          <div className="relative backdrop-blur-md border border-border p-6 rounded-2xl shadow-xl bg-background/80 text-center">
             <CornerElements />
             <p className="text-muted-foreground py-8">
               No goals found. Set your first nutritional goal above.
