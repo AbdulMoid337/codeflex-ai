@@ -90,7 +90,7 @@ function SortableGoalItem({ goal, editGoalId, savingGoalId, saveGoal, handleEdit
             {...listeners}
             className="cursor-grab active:cursor-grabbing text-muted-foreground"
           >
-            <GripVertical className="w-4 h-4" />
+            <GripVertical className="w-6 h-6 md:w-4 md:h-4" />
           </span>
           <h3 className="text-lg font-semibold capitalize">
             {goal.type} ({goal.period})
