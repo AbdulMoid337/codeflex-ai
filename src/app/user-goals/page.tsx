@@ -5,9 +5,11 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import CornerElements from "@/components/CornerElements";
 import { Loader } from "@/components/ui/loader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Pencil, Save, Loader2 } from "lucide-react";
+import { Pencil, Save, Loader2, GripVertical } from "lucide-react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 import {
   BarChart,
   Bar,
@@ -28,9 +30,23 @@ export default function GoalsPage() {
   const [editGoalId, setEditGoalId] = useState<string | null>(null);
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null);
 
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(goalsList);
+    const [reordered] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reordered);
+    setGoalsList(items);
+  };
+
   const goalsProgress = useQuery(api.goals.getGoalProgress, {
     userId: userId || "",
   });
+  const [goalsList, setGoalsList] = useState(goalsProgress || []);
+  useEffect(() => {
+    if (goalsProgress) setGoalsList(goalsProgress);
+  }, [goalsProgress]);
+
   const chartData = goalsProgress?.map((goal) => ({
     ...goal,
     percent: parseFloat(goal.percent.toFixed(1)),
@@ -157,58 +173,83 @@ export default function GoalsPage() {
               </div>
               <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
               <div className="space-y-4">
-                {goalsProgress.map((goal, idx) => (
-                  <div
-                    key={idx}
-                    className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg hover:bg-primary/5 transition"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-semibold capitalize">
-                        {goal.type} ({goal.period})
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-mono text-muted-foreground">
-                          {Math.round(goal.current)}/{goal.target}
-                          {goal.type === "calories" ? "" : "g"}
-                        </span>
-                        <button
-                          onClick={async () => {
-                            if (editGoalId === goal._id) {
-                              setSavingGoalId(goal._id);
-                              await saveGoal();
-                              setSavingGoalId(null);
-                            } else {
-                              handleEdit(goal);
-                            }
-                          }}
-                          className="text-muted-foreground hover:text-primary transition"
-                          title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
-                          disabled={savingGoalId === goal._id}
-                        >
-                          {editGoalId === goal._id ? (
-                            savingGoalId === goal._id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Save className="w-4 h-4" />
-                            )
-                          ) : (
-                            <Pencil className="w-4 h-4" />
-                          )}
-                        </button>
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <Droppable droppableId="goals">
+                    {(provided) => (
+                      <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
+                        {goalsList.map((goal, idx) => (
+                          <Draggable key={goal._id} draggableId={goal._id} index={idx}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg hover:bg-primary/5 transition"
+                              >
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      {...provided.dragHandleProps}
+                                      className="cursor-grab active:cursor-grabbing text-muted-foreground"
+                                    >
+                                      <GripVertical className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold capitalize">
+                                      {goal.type} ({goal.period})
+                                    </h3>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-mono text-muted-foreground">
+                                      {Math.round(goal.current)}/{goal.target}
+                                      {goal.type === "calories" ? "" : "g"}
+                                    </span>
+                                    <button
+                                      onClick={async () => {
+                                        if (editGoalId === goal._id) {
+                                          setSavingGoalId(goal._id);
+                                          await saveGoal();
+                                          setSavingGoalId(null);
+                                        } else {
+                                          handleEdit(goal);
+                                        }
+                                      }}
+                                      className="text-muted-foreground hover:text-primary transition"
+                                      title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
+                                      disabled={savingGoalId === goal._id}
+                                    >
+                                      {editGoalId === goal._id ? (
+                                        savingGoalId === goal._id ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <Save className="w-4 h-4" />
+                                        )
+                                      ) : (
+                                        <Pencil className="w-4 h-4" />
+                                      )}
+                                    </button>
+                                  </div>
+                                </div>
+
+                                <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                                  <div
+                                    className="bg-primary h-full rounded-full transition-all duration-500"
+                                    style={{ width: `${goal.percent}%` }}
+                                  ></div>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {Math.min(goal.percent, 100).toFixed(1)}% of your{" "}
+                                  {goal.period} {goal.type} goal reached
+                                </p>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
                       </div>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-primary h-full rounded-full transition-all duration-500"
-                        style={{ width: `${goal.percent}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {Math.min(goal.percent, 100).toFixed(1)}% of your{" "}
-                      {goal.period} {goal.type} goal reached
-                    </p>
-                  </div>
-                ))}
+                    )}
+                  </Droppable>
+                </DragDropContext>
+
               </div>
             </div>
 
