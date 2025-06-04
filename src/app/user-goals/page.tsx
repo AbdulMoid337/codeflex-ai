@@ -143,6 +143,18 @@ function SortableGoalItem({ goal, editGoalId, savingGoalId, saveGoal, handleEdit
 export default function GoalsPage() {
   const { user } = useUser();
   const userId = user?.id;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // 768px is typical tablet/mobile breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const [type, setType] = useState("calories");
   const [target, setTarget] = useState("");
@@ -303,35 +315,91 @@ export default function GoalsPage() {
               </div>
               <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
               <div className="space-y-4">
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={goalsList.map((goal) => goal._id)}
-                    strategy={verticalListSortingStrategy}
+                {isMobile ? (
+                  <div className="space-y-4">
+                    {goalsList.map((goal, idx) => (
+                      <div
+                        key={goal._id}
+                        className="border border-border rounded-2xl p-4 bg-white/10 shadow-lg"
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-lg font-semibold capitalize">
+                            {goal.type} ({goal.period})
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-mono text-muted-foreground">
+                              {Math.round(goal.current)}/{goal.target}
+                              {goal.type === "calories" ? "" : "g"}
+                            </span>
+                            <button
+                              onClick={async () => {
+                                if (editGoalId === goal._id) {
+                                  setSavingGoalId(goal._id);
+                                  await saveGoal();
+                                  setSavingGoalId(null);
+                                } else {
+                                  handleEdit(goal);
+                                }
+                              }}
+                              className="text-muted-foreground hover:text-primary transition"
+                              title={editGoalId === goal._id ? "Save goal" : "Edit goal"}
+                              disabled={savingGoalId === goal._id}
+                            >
+                              {editGoalId === goal._id ? (
+                                savingGoalId === goal._id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Save className="w-4 h-4" />
+                                )
+                              ) : (
+                                <Pencil className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                          <div
+                            className="bg-primary h-full rounded-full transition-all duration-500"
+                            style={{ width: `${goal.percent}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {Math.min(goal.percent, 100).toFixed(1)}% of your {goal.period} {goal.type} goal reached
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
                   >
-                    <div className="space-y-4">
-                      {goalsList.map((goal, idx) => (
-                        <SortableGoalItem
-                          key={goal._id}
-                          goal={goal}
-                          idx={idx}
-                          editGoalId={editGoalId}
-                          savingGoalId={savingGoalId}
-                          saveGoal={saveGoal}
-                          handleEdit={handleEdit}
-                          setSavingGoalId={setSavingGoalId}
-                          GripVertical={GripVertical}
-                          Loader2={Loader2}
-                          Save={Save}
-                          Pencil={Pencil}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
+                    <SortableContext
+                      items={goalsList.map((goal) => goal._id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-4">
+                        {goalsList.map((goal, idx) => (
+                          <SortableGoalItem
+                            key={goal._id}
+                            goal={goal}
+                            idx={idx}
+                            editGoalId={editGoalId}
+                            savingGoalId={savingGoalId}
+                            saveGoal={saveGoal}
+                            handleEdit={handleEdit}
+                            setSavingGoalId={setSavingGoalId}
+                            GripVertical={GripVertical}
+                            Loader2={Loader2}
+                            Save={Save}
+                            Pencil={Pencil}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                )}
               </div>
             </div>
 
