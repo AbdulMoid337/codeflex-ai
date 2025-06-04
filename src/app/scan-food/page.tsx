@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Sparkles, Trash2 , Loader2 } from "lucide-react";
+import { Sparkles, Trash2, Loader2 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -30,7 +30,7 @@ export default function ScanPage() {
   const [deletingScanId, setDeletingScanId] = useState<string | null>(null);
 
   const deleteFoodScan = useMutation(api.foodScans.deleteFoodScan);
-  
+
   const handleDelete = async (scanId: string) => {
     setDeletingScanId(scanId);
     await deleteFoodScan({ scanId: scanId as any });
@@ -79,13 +79,13 @@ export default function ScanPage() {
           Food Scanner
         </h1>
         <Link href="/user-goals">
-        <Button
-      size="lg"
-      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
-    >
-       Goals and Stats
-      <Sparkles className=" h-5 w-5" />
-    </Button>
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform animate-pulse"
+          >
+            Goals and Stats
+            <Sparkles className=" h-5 w-5" />
+          </Button>
         </Link>
       </div>
 
@@ -193,7 +193,8 @@ export default function ScanPage() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(scan._id)}}
+                              handleDelete(scan._id)
+                            }}
                             className="text-red-500 hover:text-red-600"
                             disabled={deletingScanId === scan._id}
                           >

@@ -185,35 +185,35 @@ const UserPrograms = () => {
         </div>
 
         {/* CTA section */}
-   <div className="mt-16 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 text-center">
-  <Link href="/generate-program">
-  <Button
-      size="lg"
-      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
-    >
-       Generate Your Program
-      <Sparkles className=" h-5 w-5" />
-    </Button>
-  </Link>
+        <div className="mt-16 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 text-center">
+          <Link href="/generate-program">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
+            >
+              Generate Your Program
+              <Sparkles className=" h-5 w-5" />
+            </Button>
+          </Link>
 
-  <h3 className="pt-3 font-mono font-bold md:pt-0">OR</h3>
+          <h3 className="pt-3 font-mono font-bold md:pt-0">OR</h3>
 
-  <Link href="/scan-food">
-  <Button
-      size="lg"
-      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
-    >
-       Scan Food With AI
-      <Sparkles className=" h-5 w-5" />
-    </Button>
-  </Link>
-</div>
+          <Link href="/scan-food">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
+            >
+              Scan Food With AI
+              <Sparkles className=" h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
 
         <div className="flex  justify-center">
-        <p className="text-muted-foreground mt-4 pt-5">
+          <p className="text-muted-foreground mt-4 pt-5">
             Join 500+ users with AI-customized fitness programs
           </p>
-          </div>
+        </div>
       </div>
     </div>
   );

@@ -38,11 +38,11 @@ const Navbar = () => {
       <div ref={navbarRef} className="container mx-auto flex items-center justify-between flex-col">
         <div className="w-full flex items-center justify-between">
           {/* LOGO */}
-          <Link href="/" className="flex items-center relative pl-2 gap-3">
-            <div className="p-2 bg-primary/20 rounded-full shadow-lg">
-              <ZapIcon className="w-6 h-6 text-primary drop-shadow" />
+          <Link href="/" className="flex items-center relative pl-2 gap-1">
+            <div className="p-1 bg-primary/15 rounded">
+              <ZapIcon className="w-4 h-4 text-primary" />
             </div>
-            <span className="text-2xl font-extrabold font-mono tracking-tight drop-shadow-lg">
+            <span className="text-xl font-extrabold font-mono tracking-tight drop-shadow-lg">
               code<span className="text-primary">flex</span>.ai
             </span>
           </Link>
@@ -65,6 +65,7 @@ const Navbar = () => {
                 >
                   <DumbbellIcon size={16} />
                   <span>Generate</span>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 </Link>
 
                 <Link
@@ -81,15 +82,17 @@ const Navbar = () => {
                 >
                   <Brain size={16} />
                   <span className="font-mono">AI Meal Scanner</span>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 </Link>
+                
                 <Button
                   asChild
                   variant="outline"
-                  className="ml-2 border-primary/50 text-primary hover:text-white hover:bg-primary/10"
+                  className=" border-primary/50 text-primary hover:text-white hover:bg-primary/10"
                 >
                   <Link href="/generate-program ">Get Started</Link>
                 </Button>
-                
+
                 <UserButton />
               </>
             ) : (
@@ -126,7 +129,7 @@ const Navbar = () => {
                 </Button>
                 <UserButton />
                 {/* MOBILE HAMBURGER BUTTON */}
-                <button 
+                <button
                   onClick={toggleMobileMenu}
                   className="p-2 text-foreground hover:text-primary transition-colors"
                   aria-label="Toggle mobile menu"
@@ -136,25 +139,25 @@ const Navbar = () => {
               </>
             ) : (
               <>
-              <div className="relative pr-2 flex gap-2">
-                <SignInButton>
-                  <Button
-                    variant={"outline"}
-                    size="sm"
-                    className="border-primary/50 text-primary hover:text-white hover:bg-primary/10"
-                  >
-                    Sign In
-                  </Button>
-                </SignInButton>
+                <div className="relative pr-2 flex gap-2">
+                  <SignInButton>
+                    <Button
+                      variant={"outline"}
+                      size="sm"
+                      className="border-primary/50 text-primary hover:text-white hover:bg-primary/10"
+                    >
+                      Sign In
+                    </Button>
+                  </SignInButton>
 
-                <SignUpButton>
-                  <Button 
-                    size="sm"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    Sign Up
-                  </Button>
-                </SignUpButton>
+                  <SignUpButton>
+                    <Button
+                      size="sm"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      Sign Up
+                    </Button>
+                  </SignUpButton>
                 </div>
               </>
             )}
@@ -181,6 +184,7 @@ const Navbar = () => {
                 >
                   <DumbbellIcon size={16} />
                   <span className="font-mono">Generate</span>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 </Link>
                 <Link
                   href="/profile"
@@ -196,7 +200,8 @@ const Navbar = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Brain size={16} />
-                  <span className="font-mono">AI Meal Scanner✨</span>
+                  <span className="font-mono">AI Meal Scanner</span>
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                 </Link>
               </nav>
             </div>
