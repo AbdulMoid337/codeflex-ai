@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { Sparkles, Trash2 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function ScanPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -68,9 +70,20 @@ export default function ScanPage() {
 
   return (
     <div className="w-full min-h-screen px-4 py-8 md:px-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-        Food Scanner
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-center">
+          Food Scanner
+        </h1>
+        <Link href="/user-goals">
+        <Button
+      size="sm"
+      className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-5 text-lg  w-full  md:w-auto"
+    >
+       Goals and Stats
+      <Sparkles className=" h-5 w-5" />
+    </Button>
+        </Link>
+      </div>
 
       <form onSubmit={handleSubmit} className="w-full space-y-4 ">
         <div className="border-2 border-dashed  border-gray-300 rounded-lg p-4 text-center">
