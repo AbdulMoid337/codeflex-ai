@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/accordion";
 import { Loader } from "@/components/ui/loader";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2 , Loader2 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -27,10 +27,14 @@ export default function ScanPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
+  const [deletingScanId, setDeletingScanId] = useState<string | null>(null);
 
   const deleteFoodScan = useMutation(api.foodScans.deleteFoodScan);
+  
   const handleDelete = async (scanId: string) => {
+    setDeletingScanId(scanId);
     await deleteFoodScan({ scanId: scanId as any });
+    setDeletingScanId(null);
     toast.success("Scan deleted successfully");
   };
 
@@ -76,8 +80,8 @@ export default function ScanPage() {
         </h1>
         <Link href="/user-goals">
         <Button
-      size="sm"
-      className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-5 text-lg  w-full  md:w-auto"
+      size="lg"
+      className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform"
     >
        Goals and Stats
       <Sparkles className=" h-5 w-5" />
@@ -92,7 +96,7 @@ export default function ScanPage() {
               <img
                 src={preview}
                 alt="Preview"
-                className="max-h-64 mx-auto rounded-lg object-cover"
+                className="max-h-64 mx-auto rounded-xl object-cover border-4 border-primary/30 shadow-lg"
               />
               <button
                 type="button"
@@ -162,7 +166,7 @@ export default function ScanPage() {
                 <span className="text-foreground">Recently Scanned Foods</span>
               </h2>
             </div>
-            <div className="h-px w-full bg-gradient-to-r from-primary via-secondary to-primary opacity-50 my-4"></div>
+            <div className="h-1 w-full bg-gradient-to-r from-primary via-secondary to-primary rounded-full my-6 animate-pulse"></div>
             <Accordion type="multiple" className="space-y-4">
               {recentScans.map((scan) => (
                 <div key={scan._id} className="flex flex-col ">
@@ -187,10 +191,17 @@ export default function ScanPage() {
                             {scan.totalCalories} CAL
                           </span>
                           <button
-                            onClick={() => handleDelete(scan._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(scan._id)}}
                             className="text-red-500 hover:text-red-600"
+                            disabled={deletingScanId === scan._id}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            {deletingScanId === scan._id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
