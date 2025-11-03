@@ -4,6 +4,7 @@ import { Webhook } from "svix";
 import { api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { auth } from "@clerk/nextjs/server"
 
 const http = httpRouter();
 
@@ -123,6 +124,10 @@ http.route({
   path: "/vapi/generate-program",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
+     const { userId } = await auth(); // ✅ Securely get userId from Clerk session
+    if (!userId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     try {
       const payload = await request.json();
 
@@ -245,7 +250,7 @@ http.route({
 
       // save to our DB: CONVEX
       const planId = await ctx.runMutation(api.plans.createPlan, {
-        userId: user_id,
+        userId,
         dietPlan,
         isActive: true,
         workoutPlan,
