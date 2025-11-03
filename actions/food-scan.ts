@@ -2,49 +2,43 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { api } from "../convex/_generated/api"
+import { api } from "../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-// Scan food image and get nutritional information
 export async function scanFoodImage(file: File) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
-    // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-    // Convert ArrayBuffer to Base64
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
-      Analyze this food image and extract the following information in JSON format:
-      - Food items (list all visible food items)
-      - Calories for each food item
-      - Protein (in grams) for each food item
-      - Carbs (in grams) for each food item
-      - Fat (in grams) for each food item
-      - Total calories for the entire meal
-      
-      Only respond with valid JSON in this exact format:
-      {
-        "foodItems": [
-          {
-            "name": "string",
-            "calories": number,
-            "protein": number,
-            "carbs": number,
-            "fat": number,
-          }
-        ],
-        "totalCalories": number
-      }
+    Analyze this food image and extract nutritional information in JSON format:
+    - List all visible food items
+    - Calories, Protein (g), Carbs (g), and Fat (g) for each
+    - Total calories for the meal
 
-     If the image is not of food, return: {}
+    Respond ONLY with valid JSON in this structure:
+    {
+      "foodItems": [
+        {
+          "name": "string",
+          "calories": number,
+          "protein": number,
+          "carbs": number,
+          "fat": number
+        }
+      ],
+      "totalCalories": number
+    }
+
+    If the image is not of food, return {}.
     `;
 
     const result = await model.generateContent([
@@ -54,40 +48,34 @@ export async function scanFoodImage(file: File) {
           mimeType: file.type,
         },
       },
-      prompt,
+      { text: prompt },
     ]);
 
-    const response =  result.response;
-    const text = response.text();
-    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+    const text = result.response.text() ?? "";
+    const cleanedText = text.replace(/```(?:json)?\n?|```/g, "").trim();
 
+    let data: any;
     try {
-      const data = JSON.parse(cleanedText);
-      
-      // Store the scan result in Convex
-      if (data.foodItems && data.foodItems.length > 0) {
-        // Convert the image to a Base64 data URL instead of a blob URL
-        const imageUrl = `data:${file.type};base64,${base64String}`;
-        
-        // Save to Convex database
-        await convex.mutation(api.foodScans.createFoodScan, {
-          userId,
-          imageUrl,
-          foodItems: data.foodItems,
-          totalCalories: data.totalCalories,
-        });
-      }
-      
-      return {
-        success: true,
-        data: data,
-      };
-    } catch (parseError) {
-      console.error("Error parsing JSON response:", parseError);
+      data = JSON.parse(cleanedText);
+    } catch {
+      console.error("Gemini returned invalid JSON:", cleanedText);
       throw new Error("Invalid response format from Gemini");
     }
+
+    if (data.foodItems && Array.isArray(data.foodItems) && data.foodItems.length > 0) {
+      const imageUrl = `data:${file.type};base64,${base64String}`;
+
+      await convex.mutation(api.foodScans.createFoodScan, {
+        userId,
+        imageUrl,
+        foodItems: data.foodItems,
+        totalCalories: data.totalCalories,
+      });
+    }
+
+    return { success: true, data };
   } catch (error: any) {
     console.error("Error scanning food image:", error);
-    throw new Error("Failed to scan food image");
+    throw new Error(error.message || "Failed to scan food image");
   }
 }
