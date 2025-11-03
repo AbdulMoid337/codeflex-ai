@@ -30,7 +30,7 @@ const ProfilePage = () => {
   );
   const [selectedPlanId, setSelectedPlanId] = useState<null | string>(null);
 
-  const activePlan = allPlans?.find((plan) => plan.isActive);
+  const activePlan = allPlans?.find((plan) => plan.isActive); 
 
   const currentPlan = selectedPlanId
     ? allPlans?.find((plan) => plan._id === selectedPlanId)
