@@ -257,6 +257,7 @@ http.route({
           success: true,
           data: {
             planId,
+            user_id,
             workoutPlan,
             dietPlan,
           },
