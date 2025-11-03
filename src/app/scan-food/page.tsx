@@ -177,7 +177,6 @@ export default function ScanPage() {
                   >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-primary/10 ">
                       <div className="flex justify-between w-full items-center">
-                        {/* Left side: Date */}
                         <span className="text-primary">
                           {new Date(scan.timestamp).toLocaleString(undefined, {
                             dateStyle: "medium",
@@ -185,7 +184,6 @@ export default function ScanPage() {
                           })}
                         </span>
 
-                        {/* Right side: Calories + Trash */}
                         <div className="flex items-center gap-3">
                           <span className="text-xs text-muted-foreground font-mono font-extrabold">
                             {scan.totalCalories} CAL
